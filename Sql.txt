@@ -1,0 +1,33 @@
+CREATE TABLE Trades (
+    TradeId INT PRIMARY KEY,                          -- Unique trade identifier
+    Version INT NOT NULL,                             -- Trade version number
+    SecurityCode NVARCHAR(10) NOT NULL,               -- Ticker code
+    Quantity INT NOT NULL,                            -- Number of shares
+    Direction NVARCHAR(10) NOT NULL CHECK (Direction IN ('Buy', 'Sell')), -- Trade type
+    IsCancelled BIT NOT NULL DEFAULT 0,               -- Flag to indicate cancelation
+    LastUpdatedAt DATETIME DEFAULT GETDATE()          -- Timestamp
+);
+GO
+
+-- Create the Transactions table
+CREATE TABLE Transactions (
+    TransactionId INT IDENTITY PRIMARY KEY,           -- Auto-incremented ID
+    TradeId INT NOT NULL,                             -- FK reference to Trades
+    Version INT NOT NULL,
+    SecurityCode NVARCHAR(20) NOT NULL,
+    Quantity INT NOT NULL,
+    Action NVARCHAR(10) NOT NULL,                     -- INSERT, UPDATE, CANCEL
+    Direction NVARCHAR(10) NOT NULL                   -- BUY, SELL
+);
+GO
+
+-- Insert sample/mock transaction data
+INSERT INTO Transactions (TradeId, Version, SecurityCode, Quantity, Action, Direction)
+VALUES
+(1, 1, 'REL', 50, 'INSERT', 'Buy'),
+(2, 1, 'ITC', 40, 'INSERT', 'Sell'),
+(3, 1, 'INF', 70, 'INSERT', 'Buy'),
+(1, 2, 'REL', 60, 'UPDATE', 'Buy'),
+(2, 2, 'ITC', 30, 'CANCEL', 'Buy'),
+(4, 1, 'INF', 20, 'INSERT', 'Sell');
+GO
